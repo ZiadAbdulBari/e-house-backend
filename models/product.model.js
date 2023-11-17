@@ -38,6 +38,14 @@ const Product = sequelize.define('product',{
         type:Sequqlize.INTEGER,
         allowNull:false,
     },
+    discount_price:{
+        type:Sequqlize.INTEGER,
+        allowNull:false,
+    },
+    suggested:{
+        type:Sequqlize.BOOLEAN,
+        allowNull:false,
+    },
 })
 Product.belongsTo(Category,{onDelete: 'CASCADE'});
 Product.belongsTo(SubCategory,{onDelete: 'CASCADE'});
