@@ -3,6 +3,7 @@ const sequelize = require('../util/database');
 const OrderItem = require('./order_item.model');
 const Payment = require('./payment.model');
 const User = require('./user.model');
+const ShippingAddress = require('./shipping_address.model');
 const Order = sequelize.define('order',{
     id:{
         type:Sequqlize.INTEGER,
@@ -21,4 +22,5 @@ const Order = sequelize.define('order',{
     },
 })
 Order.hasMany(Payment);
+Order.belongsTo(ShippingAddress)
 module.exports = Order;

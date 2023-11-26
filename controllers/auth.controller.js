@@ -18,8 +18,8 @@ module.exports.registration = async (req, res) => {
       });
     }
     const password = await bcrypt.hash(req.body.password, 10);
-    await User.create({ email: req.body.email, password: password });
-    await Profile.create({email:req.bodyemail});
+    const newUser = await User.create({ email: req.body.email, password: password });
+    await Profile.create({email:req.body.email,userId:newUser.id});
     return res.status(200).json({
       status: 200,
       message: "Successfully created",
@@ -88,7 +88,8 @@ module.exports.updateProfile = async (req,res)=>{
       email: req.body.email,
       phone: req.body.phone
     }
-    await Profile.update(userProfile,{where:{usedId:req.id}});
+    console.log(userProfile);
+    await Profile.update(userProfile,{where:{userId:req.id}});
     return res.status(200).json({
       status:200,
       message:"Profile has beed updated."
@@ -109,7 +110,7 @@ module.exports.getProfile = async (req,res)=>{
         message:"Method is not allowed."
       })
     }
-    const profile = Profile.findOne({userId:req.id});
+    const profile = await Profile.findOne({where:{userId:req.id}});
     return res.status(200).json({
       status:200,
       profile:profile

@@ -11,7 +11,9 @@ module.exports.addProduct = async (req, res) => {
           categoryId:parseInt(req.body.category_id),
           subcategoryId:parseInt(req.body.subcategory_id),
           short_description:req.body.short_description,
-          aditional_data:req.body.aditional_data
+          aditional_data:req.body.aditional_data,
+          discount_price:parseInt(req.body.discount_price),
+          suggested:req.body.suggested,
         };
         const createProduct = await Product.create(product);
         return res.status(200).json({

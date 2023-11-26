@@ -3,6 +3,7 @@ const Order = require('../models/order.model');
 const OrderItem = require('../models/order_item.model');
 const Payment = require('../models/payment.model');
 const Product = require('../models/product.model');
+const ShippingAddress = require('../models/shipping_address.model');
 module.exports.placeOrder = async (req,res)=>{
     try{
         const order = await Order.create({
@@ -41,7 +42,78 @@ module.exports.placeOrder = async (req,res)=>{
     }
     catch(error){
         return res.status(500).json({
-            message:"Order place successfull"
+            message:error
+        })
+    }
+}
+module.exports.addShippingAddress = async (req,res)=>{
+    try{
+        if(req.method != 'POST'){
+            return res.status(405).json({
+                status:405,
+                message:"Methods is not allowed."
+            })
+        }
+        const newShippingAddress = {
+            receiver_name: req.body.name,
+            receiver_phone: req.body.phone,
+            receiver_address: req.body.address,
+            receiver_email: req.body.email,
+            is_gift: req.body.gift,
+            userId:req.id,
+        }
+        await ShippingAddress.create(newShippingAddress);
+        return res.status(200).json({
+            status:200,
+            message: "New shipping address added."
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            status:500,
+            message:error
+        })
+    }
+}
+module.exports.getShippingAddress = async (req,res)=>{
+    try{
+        if(req.method != 'GET'){
+            return res.status(405).json({
+                status:405,
+                message:"Methods is not allowed."
+            })
+        }
+        const allAddress = await ShippingAddress.findAll({usedId:req.id});
+        return res.status(200).json({
+            status:200,
+            shipping_address:allAddress
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            status:500,
+            message:error
+        })
+    }
+}
+module.exports.deleteShippingAddress = async (req,res)=>{
+    try{
+        if(req.method != 'POST'){
+            return res.status(405).json({
+                status:405,
+                message:"Methods is not allowed."
+            })
+        }
+        await ShippingAddress.destroy({id:req.body.id},{where:{usedId:req.id}});
+        return res.status(200).json({
+            status:200,
+            message:"Address has been deleted."
+        })
+    }
+    catch{
+        return res.status(500).json({
+            status:500,
+            message:error
         })
     }
 }
