@@ -3,36 +3,32 @@ const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
 module.exports.addToCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ where: { userId: req.id } });
-    console.log('dd',cart)
+    let cart = await Cart.findOne({ userId: req.id } );
     if (!cart) {
       const product = await Product.findOne({
         id: parseInt(req.body.product_id),
       });
-      console.log("habi",product);
       const totalprice = product.price;
       cart = await Cart.create({
         userId: req.id,
         total_price: parseInt(totalprice),
       });
     } else {
-      const product = await Product.findOne({
+      const product = await Product.findOne({where:{
         id: parseInt(req.body.product_id),
-      });
-      console.log("habi",product);
-      const totalprice = parseInt(cart.total_price) + parseInt(product.price);
+      }});
+      const totalprice = parseInt(cart.total_price) + (parseInt(product.price)*parseInt(req.body.quantity));
       await Cart.update(
         { total_price: parseInt(totalprice) },
         { where: { userId: req.id } }
       );
     }
-    const cartItem = await CartItem.findOne(
+    const cartItem = await CartItem.findOne({where:
      {
         cartId: cart.id,
         productId: req.body.product_id,
       },
-    );
-    console.log("jabi",cartItem);
+    });
     if (!cartItem) {
       const newCartItem = await CartItem.create({
         cartId: cart.id,
@@ -56,7 +52,7 @@ module.exports.addToCart = async (req, res) => {
 };
 module.exports.getCartData = async (req, res) => {
   try {
-    const cart = await Cart.findOne({where:{ userId: req.id }});
+    const cart = await Cart.findOne({ userId: req.id });
     if (cart) {
       const totalPrice =cart?.total_price;
       const cartData = await CartItem.findAll({ cartId: cart.id });
@@ -137,11 +133,20 @@ module.exports.deleteCartProduct = async (req, res) => {
         message: "Method is not allowed",
       });
     }
+    const cartId = await Cart.findOne({where:{userId:req.id}});
+    const remaining = await CartItem.findAll({where:{cartId:cartId.id}});
+    
     await CartItem.destroy({
       where: {
         id: req.body.cartItemId,
       },
     });
+    if(remaining.length==1){
+      await Cart.destroy({where:{
+        userId:req.id
+      }})
+    }
+    
     return res.status(200).json({
       status: 200,
       message: "Successfully deleted from cart.",

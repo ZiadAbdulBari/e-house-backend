@@ -6,6 +6,6 @@ const route = express.Router();
 route.post('/add-to-cart',tokenCheck, addToCart);
 route.get('/get-cart', getCartData);
 route.post('/quantity',quantityManagement);
-route.post('/delete-from-cart',deleteCartProduct);
+route.post('/delete-from-cart',tokenCheck,deleteCartProduct);
 
 module.exports = route;
