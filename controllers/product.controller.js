@@ -44,9 +44,10 @@ module.exports.getProduct = async (req, res) => {
     }
 };
 module.exports.getProductDetails = async (req,res)=>{
-    // console.log(req.params);
+    console.log(req.params);
     try{
-        const products = await Product.findOne({id:req.params.id});
+        const products = await Product.findOne({where:{id:req.params.id}});
+        console.log(products)
         return res.status(200).json({
             status:200,
             products: products,

@@ -28,6 +28,10 @@ const ShippingAddress = sequelize.define('shippingaddress',{
     is_gift:{
         type:Sequqlize.BOOLEAN,
         allowNull:true,
+    },
+    message:{
+        type:Sequqlize.TEXT,
+        allowNull:true,
     }
 })
 module.exports = ShippingAddress;

@@ -11,11 +11,18 @@ const Order = sequelize.define('order',{
         allowNull:false,
         primaryKey:true
     },
+    order_number:{
+        type:Sequqlize.STRING,
+        allowNull:false,
+    },
     status:{
         type:Sequqlize.STRING,
         allowNull:false,
     },
-    
+    estimated_delivery:{
+        type:Sequqlize.DATE,
+        allowNull:false,
+    },
     total_price:{
         type:Sequqlize.INTEGER,
         allowNull:false,
