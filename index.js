@@ -18,11 +18,13 @@ const product = require('./routes/product.route');
 const cart = require('./routes/cart.route');
 const order = require('./routes/order.route');
 const category = require('./routes/category.route');
+const filter = require('./routes/filter.route');
 app.use('/',auth);
 app.use('/',product);
 app.use('/',cart);
 app.use('/',order);
 app.use('/',category);
+app.use('/',filter);
 
 db.sync().then(()=>{
     app.listen(4000);

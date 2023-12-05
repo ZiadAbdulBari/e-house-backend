@@ -51,6 +51,7 @@ module.exports.getProductDetails = async (req,res)=>{
         return res.status(200).json({
             status:200,
             products: products,
+            // category:category
         });
     }
     catch(error){
