@@ -38,12 +38,13 @@ module.exports.search = async (req,res)=>{
         result.subcategory = subcategory
     }
     else if(searchByTitle =='false' && searchByCategory =='false' && searchBySubcategory != 'false'){
-        console.log("*****")
         product = await Product.findAll({where:{
             subcategoryId:req.params.subcategory
         }})
-        // subcategory = await SubCategory.findAll({where:{categoryId:req.params.category}})
+        const subcategoryTitle = await SubCategory.findAll({where:{id:searchBySubcategory}})
         // result.subcategory = subcategory;
+        result.title = subcategoryTitle[0].subcategory_name;
+        result.count = product.length;
         result.product = product;
     }
     res.status(200).json({
