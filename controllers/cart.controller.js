@@ -7,7 +7,7 @@ module.exports.addToCart = async (req, res) => {
     if (!cart) {
       cart = await Cart.create({
         userId: req.id,
-        total_price: parseInt(req.body.price),
+        total_price: parseInt(req.body.price)*parseInt(req.body.quantity),
       });
     } else {
       const totalprice = parseInt(cart.total_price) + (parseInt(req.body.price)*parseInt(req.body.quantity));

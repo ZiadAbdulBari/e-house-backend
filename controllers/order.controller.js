@@ -63,7 +63,6 @@ module.exports.deleteShippingAddress = async (req, res) => {
         message: "Method is not allowed.",
       });
     }
-    console.log(req.id);
 
     await ShippingAddress.destroy({
       where: { id: req.body.id },
@@ -121,7 +120,6 @@ module.exports.placeOrder = async (req, res) => {
         { where: { id: product.id } }
       );
     });
-    console.log(req.body.paymentHistory);
     await Payment.create({
       orderId: order.id,
       medium: req.body.medium,
