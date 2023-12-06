@@ -5,19 +5,12 @@ module.exports.addToCart = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.id } );
     if (!cart) {
-      const product = await Product.findOne({
-        id: parseInt(req.body.product_id),
-      });
-      const totalprice = product.price;
       cart = await Cart.create({
         userId: req.id,
-        total_price: parseInt(totalprice),
+        total_price: parseInt(req.body.price),
       });
     } else {
-      const product = await Product.findOne({where:{
-        id: parseInt(req.body.product_id),
-      }});
-      const totalprice = parseInt(cart.total_price) + (parseInt(product.price)*parseInt(req.body.quantity));
+      const totalprice = parseInt(cart.total_price) + (parseInt(req.body.price)*parseInt(req.body.quantity));
       await Cart.update(
         { total_price: parseInt(totalprice) },
         { where: { userId: req.id } }
@@ -70,6 +63,7 @@ module.exports.getCartData = async (req, res) => {
           title: product.title,
           image_url: product.image_url,
           price: product.price,
+          discount_price:product.discount_price,
           categoryId: product.categoryId,
           subcategoryId: product.subcategoryId,
         };
@@ -135,7 +129,9 @@ module.exports.deleteCartProduct = async (req, res) => {
     }
     const cartId = await Cart.findOne({where:{userId:req.id}});
     const remaining = await CartItem.findAll({where:{cartId:cartId.id}});
-    
+    const product = await Product.findOne({where:{id:req.body.productId}});
+    const price = (parseInt(cartId.total_price))-(parseInt(product.price)-parseInt(product.discount_price));
+    await Cart.update({ total_price:price },{where:{userId:req.id}})
     await CartItem.destroy({
       where: {
         id: req.body.cartItemId,
