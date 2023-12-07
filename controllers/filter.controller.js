@@ -3,9 +3,6 @@ const { Op } = require("sequelize");
 const SubCategory = require("../models/sub_category.model");
 const Category = require("../models/category.model");
 module.exports.search = async (req,res)=>{
-    
-    // const query = req.params
-    console.log(req.params);
     const searchByTitle = req.params.search;
     const searchByCategory = req.params.category;
     const searchBySubcategory = req.params.subcategory;
@@ -47,7 +44,7 @@ module.exports.search = async (req,res)=>{
         result.count = product.length;
         result.product = product;
     }
-    res.status(200).json({
+    return res.status(200).json({
         status:200,
         result:result,
     })

@@ -3,6 +3,7 @@ const sequelize = require('../util/database');
 const OrderItem = require('./order_item.model');
 const Category = require('./category.model');
 const SubCategory = require('./sub_category.model');
+const Section = require('./section.model');
 const Product = sequelize.define('product',{
     id:{
         type:Sequqlize.INTEGER,
@@ -46,8 +47,10 @@ const Product = sequelize.define('product',{
         type:Sequqlize.BOOLEAN,
         allowNull:false,
     },
+    
 })
 Product.belongsTo(Category,{onDelete: 'CASCADE'});
 Product.belongsTo(SubCategory,{onDelete: 'CASCADE'});
+Product.belongsTo(Section)
 Product.hasMany(OrderItem);
 module.exports = Product;
