@@ -2,7 +2,7 @@ const express = require('express');
 const { search } = require('../controllers/filter.controller');
 const route = express.Router();
 
-route.post('/filter/:search&:category&:subcategory',search);
+route.post('/filter/:search&:category&:subcategory&:section',search);
 
 module.exports = route;
 

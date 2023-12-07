@@ -58,7 +58,7 @@ module.exports.getSection = async (req, res) => {
     let sections = await Section.findAll();
     let result=[];
     let sectionPromises = sections.map(async(section) => {
-      const product = await Product.findAll({ where: { sectionId: section.id } });
+      const product = await Product.findAll({ where: { sectionId: section.id } },{ limit: 4 });
       let homeSection = {};
       homeSection.id = section.id;
       homeSection.section_name = section.section_name;
