@@ -4,6 +4,8 @@ const OrderItem = require('./order_item.model');
 const Category = require('./category.model');
 const SubCategory = require('./sub_category.model');
 const Section = require('./section.model');
+const ProductVariant = require('./product_variant.model');
+// const ProductVariant = require('./product_variant.model');
 const Product = sequelize.define('product',{
     id:{
         type:Sequqlize.INTEGER,
@@ -49,6 +51,7 @@ const Product = sequelize.define('product',{
     },
     
 })
+Product.hasMany(ProductVariant)
 Product.belongsTo(Category,{onDelete: 'CASCADE'});
 Product.belongsTo(SubCategory,{onDelete: 'CASCADE'});
 Product.belongsTo(Section)

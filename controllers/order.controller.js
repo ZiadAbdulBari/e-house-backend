@@ -6,6 +6,7 @@ const OrderItem = require("../models/order_item.model");
 const Payment = require("../models/payment.model");
 const Product = require("../models/product.model");
 const ShippingAddress = require("../models/shipping_address.model");
+const ProductVariant = require('../models/product_variant.model');
 module.exports.addShippingAddress = async (req, res) => {
   try {
     if (req.method != "POST") {
@@ -113,12 +114,15 @@ module.exports.placeOrder = async (req, res) => {
         price_at_purchase: product.price,
         productId: product.id,
         orderId: order.id,
+        productVariantId:product.productVariantId,
+        variants:product.variants
       };
       await OrderItem.create(newProduct);
       await Product.increment(
         { stock_quantity: -parseInt(product.cart_quantity) },
         { where: { id: product.id } }
       );
+      await ProductVariant.increment({stock:-parseInt(product.cart_quantity)},{ where: { id: product.productVariantId } })
     });
     await Payment.create({
       orderId: order.id,

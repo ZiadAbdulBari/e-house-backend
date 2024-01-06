@@ -40,7 +40,6 @@ module.exports.login = async (req, res) => {
         req.body.password,
         checkEmail[0].password
       );
-      
       if (checkPassword) {
         const token = jwt.sign(
           {
@@ -50,27 +49,27 @@ module.exports.login = async (req, res) => {
           process.env.JWT_TOKEN
         );
         
-        res.status(200).json({
+        return res.status(200).json({
           access_token: token,
           status:200,
           message: "logged in",
         });
       } else {
-        res.status(401).json({
+        return res.status(401).json({
           status:401,
           message: "Failed",
         });
       }
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         status:401,
         message: "Authentication failed",
       });
     }
-  } catch {
-    res.status(500).json({
+  } catch(error){
+    return res.status(500).json({
       status:500,
-      message: "Server error",
+      message: error,
     });
   }
 };

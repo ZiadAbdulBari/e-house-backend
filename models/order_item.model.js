@@ -3,6 +3,7 @@ const sequelize = require('../util/database');
 // const User = require('./user.model');
 const Order = require('./order.model');
 const Product = require('./product.model');
+const ProductVariant = require('./product_variant.model');
 const OrderItem = sequelize.define('orderItem',{
     id:{
         type:Sequqlize.INTEGER,
@@ -26,6 +27,11 @@ const OrderItem = sequelize.define('orderItem',{
         type:Sequqlize.INTEGER,
         allowNull:false,
     },
+    variants:{
+        type:Sequqlize.STRING,
+        allowNull:false,
+    }
 })
+OrderItem.belongsTo(ProductVariant);
 OrderItem.belongsTo(Order);
 module.exports = OrderItem;

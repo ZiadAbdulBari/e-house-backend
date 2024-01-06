@@ -1,5 +1,6 @@
 const Sequqlize = require('sequelize');
 const sequelize = require('../util/database');
+// const ProductVariant = require('./product_variant.model');
 const Variant = sequelize.define('variant',{
     id:{
         type:Sequqlize.INTEGER,
@@ -12,4 +13,5 @@ const Variant = sequelize.define('variant',{
         allowNull:true,
     },
 })
+// Variant.hasMany(ProductVariant)
 module.exports = Variant

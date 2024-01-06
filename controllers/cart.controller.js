@@ -27,6 +27,8 @@ module.exports.addToCart = async (req, res) => {
         cartId: cart.id,
         productId: parseInt(req.body.product_id),
         quantity: req.body.quantity,
+        productVariantId:req.body.productVariant_id,
+        variants:req.body.variants
       });
       res.status(200).json({
         status: 200,
@@ -66,6 +68,8 @@ module.exports.getCartData = async (req, res) => {
           discount_price:product.discount_price,
           categoryId: product.categoryId,
           subcategoryId: product.subcategoryId,
+          productVariantId:cartData.filter((qu) => qu.productId == product.id)[0].productVariantId,
+          variants:cartData.filter((qu) => qu.productId == product.id)[0].variants
         };
         cartProduct.push(item);
       });
