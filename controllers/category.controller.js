@@ -15,11 +15,13 @@ module.exports.makeCategory = async (req,res)=>{
         }
         await Category.create(newCategory);
         return res.status(200).json({
+            status:200,
             message:"New category added successfully."
         })
     }
     catch(error){
         return res.status(500).json({
+            status:500,
             message:error
         })
     }
@@ -39,11 +41,13 @@ module.exports.makeSubcategory = async (req,res)=>{
         }
         await SubCategory.create(newSubCategory);
         return res.status(200).json({
+            status:200,
             message:"New sub-category added successfully."
         })
     }
     catch(error){
         return res.status(500).json({
+            status:500,
             message:error
         })
     }

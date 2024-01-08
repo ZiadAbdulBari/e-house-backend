@@ -1,12 +1,13 @@
-const { uuid } = require('uuidv4');
-const date = require('date-and-time');
+const { uuid } = require("uuidv4");
+const date = require("date-and-time");
 const Cart = require("../models/cart.model");
 const Order = require("../models/order.model");
 const OrderItem = require("../models/order_item.model");
 const Payment = require("../models/payment.model");
 const Product = require("../models/product.model");
 const ShippingAddress = require("../models/shipping_address.model");
-const ProductVariant = require('../models/product_variant.model');
+const ProductVariant = require("../models/product_variant.model");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 module.exports.addShippingAddress = async (req, res) => {
   try {
     if (req.method != "POST") {
@@ -21,7 +22,7 @@ module.exports.addShippingAddress = async (req, res) => {
       receiver_address: req.body.address,
       receiver_email: req.body.email,
       is_gift: req.body.gift,
-      message:req.body.message,
+      message: req.body.message,
       userId: req.id,
     };
     await ShippingAddress.create(newShippingAddress);
@@ -94,9 +95,9 @@ module.exports.placeOrder = async (req, res) => {
     //     orderedProduct:req.body.products,
     //     medium:req.body.medium,
     // }
-    const orderNumber = Math.floor(Math.random()*90000) + 100000;
+    const orderNumber = Math.floor(Math.random() * 90000) + 100000;
     const now = new Date();
-    const deliveryDate = date.addDays(now, 4)
+    const deliveryDate = date.addDays(now, 4);
     const order = await Order.create({
       status: "Pending",
       total_price: req.body.total_price,
@@ -106,6 +107,7 @@ module.exports.placeOrder = async (req, res) => {
       userId: req.id,
     });
     const orderedProduct = req.body.products;
+    const stripePayment = [];
     orderedProduct.map(async (product) => {
       const newProduct = {
         quantity: parseInt(product.cart_quantity),
@@ -114,16 +116,40 @@ module.exports.placeOrder = async (req, res) => {
         price_at_purchase: product.price,
         productId: product.id,
         orderId: order.id,
-        productVariantId:product.productVariantId,
-        variants:product.variants
+        productVariantId: product.productVariantId,
+        variants: product.variants,
       };
+      const newStripeProduct = {
+        price_data:{
+          currency:'usd',
+          product_data:{
+            name:product.title,
+            images:[product.image_url],
+          },
+          unit_amount:product.price,
+        },
+        quantity:product.cart_quantity
+      };
+      stripePayment.push(newStripeProduct);
       await OrderItem.create(newProduct);
       await Product.increment(
         { stock_quantity: -parseInt(product.cart_quantity) },
         { where: { id: product.id } }
       );
-      await ProductVariant.increment({stock:-parseInt(product.cart_quantity)},{ where: { id: product.productVariantId } })
+      await ProductVariant.increment(
+        { stock: -parseInt(product.cart_quantity) },
+        { where: { id: product.productVariantId } }
+      );
     });
+    // if (req.body.medium == "stripe") {
+    //   const session = await stripe.checkout.sessions.create({
+    //     line_items: stripePayment,
+    //     mode: "payment",
+    //     success_url: "http://localhost:3000/",
+    //     cancel_url: "http://localhost:3000/",
+    //   });
+    //   res.redirect(303, session.url);
+    // }
     await Payment.create({
       orderId: order.id,
       medium: req.body.medium,
@@ -132,7 +158,7 @@ module.exports.placeOrder = async (req, res) => {
     await Cart.destroy({
       where: {
         userId: req.id,
-      }
+      },
     });
     return res.status(200).json({
       status: 200,
@@ -144,24 +170,23 @@ module.exports.placeOrder = async (req, res) => {
     });
   }
 };
-module.exports.orderList = async (req,res)=>{
-  try{
+module.exports.orderList = async (req, res) => {
+  try {
     if (req.method != "GET") {
       return res.status(405).json({
         status: 405,
         message: "Method is not allowed.",
       });
     }
-    const orders = await Order.findAll({userId:req.id})
+    const orders = await Order.findAll({ userId: req.id });
     return res.status(200).json({
       status: 200,
-      order_list: orders
+      order_list: orders,
     });
-  }
-  catch(error){
+  } catch (error) {
     return res.status(500).json({
       status: 500,
       message: error,
     });
   }
-}
+};
