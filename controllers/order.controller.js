@@ -120,15 +120,18 @@ module.exports.placeOrder = async (req, res) => {
         variants: product.variants,
       };
       const newStripeProduct = {
-        price_data:{
-          currency:'usd',
-          product_data:{
-            name:product.title,
-            images:[product.image_url],
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: product.title,
+            images: [product.image_url],
+            metadata: {
+              id: product.id,
+            },
           },
-          unit_amount:product.price,
+          unit_amount: product.price,
         },
-        quantity:product.cart_quantity
+        quantity: product.cart_quantity,
       };
       stripePayment.push(newStripeProduct);
       await OrderItem.create(newProduct);
@@ -141,29 +144,34 @@ module.exports.placeOrder = async (req, res) => {
         { where: { id: product.productVariantId } }
       );
     });
-    // if (req.body.medium == "stripe") {
-    //   const session = await stripe.checkout.sessions.create({
-    //     line_items: stripePayment,
-    //     mode: "payment",
-    //     success_url: "http://localhost:3000/",
-    //     cancel_url: "http://localhost:3000/",
-    //   });
-    //   res.redirect(303, session.url);
-    // }
     await Payment.create({
       orderId: order.id,
       medium: req.body.medium,
-      payment_history: req.body.paymentHistory,
+      payment_status: req.body.paymentStatus,
     });
     await Cart.destroy({
       where: {
         userId: req.id,
       },
     });
-    return res.status(200).json({
-      status: 200,
-      message: "Order placed successfull",
-    });
+    if (req.body.medium == "stripe") {
+      const session = await stripe.checkout.sessions.create({
+        line_items: stripePayment,
+        mode: "payment",
+        success_url: `http://localhost:3000/success/${order.id}`,
+        cancel_url: `http://localhost:3000/cancle/${order.id}`,
+      });
+      // res.redirect(303, session.url);
+      return res.status(200).json({
+        status: 200,
+        payment_url: session.url,
+      });
+    } else {
+      return res.status(200).json({
+        status: 200,
+        message: "Order placed successfull",
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       message: error,
@@ -182,6 +190,27 @@ module.exports.orderList = async (req, res) => {
     return res.status(200).json({
       status: 200,
       order_list: orders,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: error,
+    });
+  }
+};
+module.exports.changePaymentStatus = async (req, res) => {
+  try {
+    if (req.method != "POST") {
+      return res.status(405).json({
+        status: 405,
+        message: "Method is not allowed.",
+      });
+    }
+    const orderId = req.body.id;
+    await Payment.update({payment_status:'successfull'},{where:{orderId:orderId}})
+    return res.status(200).json({
+      status: 200,
+      message: "Payment successfull",
     });
   } catch (error) {
     return res.status(500).json({

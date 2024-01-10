@@ -12,8 +12,8 @@ const Payment = sequelize.define('Payment',{
         type:Sequqlize.STRING,
         allowNull:false,
     },
-    payment_history:{
-        type:Sequqlize.JSON,
+    payment_status:{
+        type:Sequqlize.STRING,
         allowNull:false,
     },
 })
