@@ -23,5 +23,9 @@ const Profile = sequelize.define('profile',{
         type:Sequqlize.STRING,
         allowNull:true,
     },
+    image_url:{
+        type:Sequqlize.STRING,
+        allowNull:true,
+    }
 })
 module.exports = Profile;

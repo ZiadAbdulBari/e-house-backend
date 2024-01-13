@@ -4,6 +4,7 @@ const { Op } = require("sequelize");
 const SubCategory = require("../models/sub_category.model");
 const Category = require("../models/category.model");
 const Section = require("../models/section.model");
+const ProductImage = require("../models/product_image.model");
 module.exports.search = async (req, res) => {
   const searchByTitle = req.params.search;
   const searchByCategory = req.params.category;
@@ -27,6 +28,9 @@ module.exports.search = async (req, res) => {
           [Op.like]: `%${search}%`,
         },
       },
+      include:{
+        model: ProductImage,
+      }
     });
     result.count = product.length;
     result.product = product;
@@ -41,12 +45,16 @@ module.exports.search = async (req, res) => {
       where: {
         categoryId: searchByCategory,
       },
+      include:{
+        model: ProductImage,
+      }
     });
     subcategory = await SubCategory.findAll({
       where: { categoryId: searchByCategory },
     });
     const categoryTitle = await Category.findAll({
       where: { id: searchByCategory },
+      
     });
     result.title = categoryTitle[0].category_name;
     result.count = product.length;
@@ -67,6 +75,9 @@ module.exports.search = async (req, res) => {
         subcategoryId: searchBySubcategory,
         categoryId: subcategoryTitle[0].categoryId,
       },
+      include:{
+        model: ProductImage,
+      }
     });
     // result.subcategory = subcategory;
     result.title = subcategoryTitle[0].subcategory_name;
@@ -82,9 +93,13 @@ module.exports.search = async (req, res) => {
       where: {
         sectionId: searchBySection,
       },
+      include:{
+        model: ProductImage,
+      }
     });
     const sectionTitle = await Section.findAll({
       where: { id: searchBySection },
+      
     });
     // result.subcategory = subcategory;
     result.title = sectionTitle[0].section_name;

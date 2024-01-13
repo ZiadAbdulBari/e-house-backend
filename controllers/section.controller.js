@@ -10,7 +10,9 @@ module.exports.addSection = async (req, res) => {
       });
     }
     await Section.create({
+      section_type: req.body.sectionType,
       section_name: req.body.sectionName,
+      section_image: req.body.sectionImage,
     });
     return res.status(200).json({
       status: 200,

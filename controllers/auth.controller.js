@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require('../models/user.model');
 const Profile = require("../models/profile.model");
+const cloudinary = require('../util/cloudinary.config');
 module.exports.registration = async (req, res) => {
   try {
     if (req.method !== "POST") {
@@ -81,13 +82,21 @@ module.exports.updateProfile = async (req,res)=>{
         message:"Method is not allowed."
       })
     }
+    let uploadImage={};
+    if(req.file){
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      uploadImage = await cloudinary.uploader.upload(dataURI,{
+        upload_preset:"essential"
+      })
+    }
     const userProfile = {
       name: req.body.name,
       address: req.body.address,
       email: req.body.email,
-      phone: req.body.phone
+      phone: req.body.phone,
+      image_url:uploadImage.url
     }
-    console.log(userProfile);
     await Profile.update(userProfile,{where:{userId:req.id}});
     return res.status(200).json({
       status:200,

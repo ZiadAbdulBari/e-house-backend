@@ -8,10 +8,18 @@ const Section = sequelize.define('section',{
         allowNull:false,
         primaryKey:true,
     },
+    type:{
+        type:Sequqlize.INTEGER,
+        allowNull:true,
+    },
     section_name:{
         type:Sequqlize.STRING,
         allowNull:true,
     },
+    image_url:{
+        type:Sequqlize.STRING,
+        allowNull:true,
+    }
 })
 
 module.exports = Section;

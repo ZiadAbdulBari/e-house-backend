@@ -5,6 +5,7 @@ const Category = require('./category.model');
 const SubCategory = require('./sub_category.model');
 const Section = require('./section.model');
 const ProductVariant = require('./product_variant.model');
+const ProductImage = require('./product_image.model');
 // const ProductVariant = require('./product_variant.model');
 const Product = sequelize.define('product',{
     id:{
@@ -14,10 +15,6 @@ const Product = sequelize.define('product',{
         primaryKey:true
     },
     title:{
-        type:Sequqlize.STRING,
-        allowNull:false,
-    },
-    image_url:{
         type:Sequqlize.STRING,
         allowNull:false,
     },
@@ -52,6 +49,7 @@ const Product = sequelize.define('product',{
     
 })
 Product.hasMany(ProductVariant)
+Product.hasMany(ProductImage)
 Product.belongsTo(Category,{onDelete: 'CASCADE'});
 Product.belongsTo(SubCategory,{onDelete: 'CASCADE'});
 Product.belongsTo(Section)

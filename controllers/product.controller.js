@@ -1,7 +1,8 @@
+const ProductImage = require("../models/product_image.model");
 const Product = require("../models/product.model");
 const ProductVariant = require("../models/product_variant.model");
 const Variant = require("../models/variant.model");
-
+const cloudinary = require("../util/cloudinary.config");
 module.exports.addProduct = async (req, res) => {
   try {
     if (req.method !== "POST") {
@@ -12,7 +13,6 @@ module.exports.addProduct = async (req, res) => {
     }
     const product = {
       title: req.body.title,
-      image_url: req.body.image_url,
       stock_quantity: parseInt(req.body.stock),
       description: req.body.description,
       price: parseInt(req.body.price),
@@ -24,6 +24,20 @@ module.exports.addProduct = async (req, res) => {
       suggested: req.body.suggested,
     };
     const createProduct = await Product.create(product);
+    const images = req.files;
+    images.forEach(async (image) => {
+      const b64 = Buffer.from(image.buffer).toString("base64");
+      let dataURI = "data:" + image.mimetype + ";base64," + b64;
+      const uploadImage = await cloudinary.uploader.upload(dataURI, {
+        upload_preset: "essential",
+      });
+      await ProductImage.create({
+        image_url: uploadImage.url,
+        productId: createProduct.id,
+      });
+    });
+    // console.log(processImage);
+    // await Promise.all(processImage);
     return res.status(200).json({
       status: 200,
       message: "Product added successfull",
@@ -63,9 +77,14 @@ module.exports.addVariantValue = async (req, res) => {
 module.exports.getProduct = async (req, res) => {
   try {
     const products = await Product.findAll({
-      include: {
-        model: ProductVariant,
-      },
+      include: [
+        {
+          model: ProductVariant,
+        },
+        {
+          model: ProductImage,
+        },
+      ],
     });
     return res.status(200).json({
       status: 200,
@@ -82,35 +101,39 @@ module.exports.getProductDetails = async (req, res) => {
   try {
     const products = await Product.findOne({
       where: { id: req.params.id },
-      include: {
-        model: ProductVariant,
-        // include: Variant,
-      },
+      include: [
+        {
+          model: ProductVariant,
+        },
+        {
+          model: ProductImage,
+        },
+      ],
     });
     const allVariant = await Variant.findAll();
     await Promise.all(allVariant);
     let arr = [];
-    allVariant.forEach((variant)=>{
-      let newArr=[];
+    allVariant.forEach((variant) => {
+      let newArr = [];
       let newObj = {
-        title:"",
-        values:[]
-      }
-      products.productVariants.forEach((v_value)=>{
-        if(variant.id==v_value.variantId){
+        title: "",
+        values: [],
+      };
+      products.productVariants.forEach((v_value) => {
+        if (variant.id == v_value.variantId) {
           newArr.push(v_value);
         }
-      })
-      if(newArr.length>0){
-        newObj.title=variant.variant_name;
-        newObj.values=newArr;
+      });
+      if (newArr.length > 0) {
+        newObj.title = variant.variant_name;
+        newObj.values = newArr;
         arr.push(newObj);
       }
-    })
+    });
     return res.status(200).json({
       status: 200,
       products: products,
-      variant:arr
+      variant: arr,
     });
   } catch (error) {
     return res.status(500).json({
