@@ -1,6 +1,6 @@
 const Product = require("../models/product.model");
 const Section = require("../models/section.model");
-
+const cloudinary = require('../util/cloudinary.config');
 module.exports.addSection = async (req, res) => {
   try {
     if (req.method != "POST") {
@@ -9,10 +9,18 @@ module.exports.addSection = async (req, res) => {
         message: "Methods is not allowed.",
       });
     }
+    let uploadImage={};
+    if(req.file){
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      uploadImage = await cloudinary.uploader.upload(dataURI,{
+        upload_preset:"essential"
+      })
+    }
     await Section.create({
-      section_type: req.body.sectionType,
+      type: req.body.sectionType,
       section_name: req.body.sectionName,
-      section_image: req.body.sectionImage,
+      image_url: uploadImage.sectionImage,
     });
     return res.status(200).json({
       status: 200,

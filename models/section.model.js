@@ -10,11 +10,11 @@ const Section = sequelize.define('section',{
     },
     type:{
         type:Sequqlize.INTEGER,
-        allowNull:true,
+        allowNull:false,
     },
     section_name:{
         type:Sequqlize.STRING,
-        allowNull:true,
+        allowNull:false,
     },
     image_url:{
         type:Sequqlize.STRING,
