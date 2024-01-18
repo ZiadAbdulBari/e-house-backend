@@ -3,6 +3,8 @@ const Product = require("../models/product.model");
 const ProductVariant = require("../models/product_variant.model");
 const Variant = require("../models/variant.model");
 const cloudinary = require("../util/cloudinary.config");
+const Category = require("../models/category.model");
+const SubCategory = require("../models/sub_category.model");
 module.exports.addProduct = async (req, res) => {
   try {
     if (req.method !== "POST") {
@@ -31,6 +33,7 @@ module.exports.addProduct = async (req, res) => {
       const uploadImage = await cloudinary.uploader.upload(dataURI, {
         upload_preset: "essential",
       });
+      ;
       await ProductImage.create({
         image_url: uploadImage.url,
         productId: createProduct.id,
@@ -83,6 +86,12 @@ module.exports.getProduct = async (req, res) => {
         },
         {
           model: ProductImage,
+        },
+        {
+          model: Category,
+        },
+        {
+          model: SubCategory,
         },
       ],
     });

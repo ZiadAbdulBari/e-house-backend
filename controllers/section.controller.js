@@ -17,6 +17,8 @@ module.exports.addSection = async (req, res) => {
         upload_preset:"essential"
       })
     }
+    // type=1 if the section needed image
+    // type=2 no need image
     await Section.create({
       type: req.body.sectionType,
       section_name: req.body.sectionName,
