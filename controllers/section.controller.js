@@ -1,6 +1,6 @@
 const Product = require("../models/product.model");
 const Section = require("../models/section.model");
-const cloudinary = require('../util/cloudinary.config');
+const cloudinary = require("../util/cloudinary.config");
 module.exports.addSection = async (req, res) => {
   try {
     if (req.method != "POST") {
@@ -9,20 +9,20 @@ module.exports.addSection = async (req, res) => {
         message: "Methods is not allowed.",
       });
     }
-    let uploadImage={};
-    if(req.file){
+    let uploadImage = {};
+    if (req.file) {
       const b64 = Buffer.from(req.file.buffer).toString("base64");
       let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-      uploadImage = await cloudinary.uploader.upload(dataURI,{
-        upload_preset:"essential"
-      })
+      uploadImage = await cloudinary.uploader.upload(dataURI, {
+        upload_preset: "essential",
+      });
     }
     // type=1 if the section needed image
     // type=2 no need image
     await Section.create({
       type: req.body.sectionType,
       section_name: req.body.sectionName,
-      image_url: uploadImage.sectionImage,
+      image_url: uploadImage?.url,
     });
     return res.status(200).json({
       status: 200,
@@ -68,13 +68,19 @@ module.exports.getSection = async (req, res) => {
     }
 
     let sections = await Section.findAll();
-    let result=[];
-    let sectionPromises = sections.map(async(section) => {
-      const product = await Product.findAll({ where: { sectionId: section.id } },{ limit: 4 });
+    let result = [];
+    let sectionPromises = sections.map(async (section) => {
       let homeSection = {};
+      if(!section.image_url){
+        const product = await Product.findAll(
+          { where: { sectionId: section.id } },
+          { limit: 4 }
+        );
+        homeSection.products = JSON.parse(JSON.stringify(product));
+      }
       homeSection.id = section.id;
       homeSection.section_name = section.section_name;
-      homeSection.products = JSON.parse(JSON.stringify(product));
+      homeSection.image_url = section.image_url;
       result.push(homeSection);
     });
     await Promise.all(sectionPromises);
