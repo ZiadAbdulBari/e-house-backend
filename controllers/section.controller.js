@@ -1,4 +1,5 @@
 const Product = require("../models/product.model");
+const ProductImage = require("../models/product_image.model");
 const Section = require("../models/section.model");
 const cloudinary = require("../util/cloudinary.config");
 module.exports.addSection = async (req, res) => {
@@ -73,7 +74,7 @@ module.exports.getSection = async (req, res) => {
       let homeSection = {};
       if(!section.image_url){
         const product = await Product.findAll(
-          { where: { sectionId: section.id } },
+          { where: { sectionId: section.id },include:{model:ProductImage} },
           { limit: 4 }
         );
         homeSection.products = JSON.parse(JSON.stringify(product));

@@ -6,13 +6,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 require('dotenv').config();
-const corsOptions = {
-    origin: 'http:http://localhost:3000', // Specify the allowed origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Allow cookies and credentials
-    optionsSuccessStatus: 204, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
+app.use(cors());
 const auth = require('./routes/auth.route');
 const product = require('./routes/product.route');
 const cart = require('./routes/cart.route');
